@@ -6,12 +6,57 @@
 int WIDTH = 800;
 int HEIGHT = 600;
 
+static unsigned int CompilerShader(unsigned int type, const std::string& source)
+{
+	unsigned int id = glCreateShader(type);
+	const char* src = source.c_str();
+	glShaderSource(id, 1, &src, nullptr);
+	glCompileShader(id);
+
+	// Error Handling
+	int result;
+	glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+	if (result == GL_FALSE)
+	{
+		int length;
+		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+		char* message = (char*)alloca(length * sizeof(char));
+		glGetShaderInfoLog(id, length, &length, message);
+		std::cout << "Failed to compile " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << " shader!" << std::endl;
+		std::cout << message << std::endl;
+		glDeleteShader(id);
+		return 0;
+	}
+
+	return id;
+}
+
+
+static unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
+{
+	unsigned int program = glCreateProgram();
+	unsigned int vs = CompilerShader(GL_VERTEX_SHADER, vertexShader);
+	unsigned int fs = CompilerShader(GL_FRAGMENT_SHADER, fragmentShader);
+
+	glAttachShader(program, vs);
+	glAttachShader(program, fs);
+
+	glLinkProgram(program);
+	glValidateProgram(program);
+
+	glDeleteShader(vs);
+	glDeleteShader(fs);
+
+	return program;
+}
+
+
 void error_callback(int error, const char* description)
 {
 	std::cerr << description << std::endl;
 }
 
-int main()
+int main(void)
 {
 	glfwSetErrorCallback(error_callback);
 
@@ -22,8 +67,8 @@ int main()
 		return -1;
 	}
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 
 	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "MyEngine", NULL, NULL);
 	if (window == NULL)
@@ -46,30 +91,47 @@ int main()
 
 	std::cout << glGetString(GL_VERSION) << std::endl;
 
-
-
-	const std::string vertexShader = "\n"
-		"#verson 330\n"
-		""
-		"\n";
-
 	float vertices[] = {
 		-0.5f, -0.5f,
 		 0.0f,  0.5f,
 		 0.5f, -0.5f
 	};
 
-	GLuint VBO;
+	GLuint VBO, VAO;
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6, vertices, GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
 
+	glBindVertexArray(0);
 
+	std::string vertexShader =
+		"#version 460\n"
+		"\n"
+		"layout(location = 0) in vec4 position;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"	gl_Position = position;\n"
+		"}\n";
+
+	std::string fragmentShdaer =
+		"#version 460\n"
+		"\n"
+		"layout(location = 0) out vec4 color;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"	color = vec4(1.0,0.0,0.0,1.0);\n"
+		"}\n";
+
+	unsigned int program = CreateShader(vertexShader, fragmentShdaer);
+	glUseProgram(program);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -80,16 +142,17 @@ int main()
 		//render
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		glfwSwapBuffers(window);
-
 		glfwPollEvents();
 	}
+
+	glDeleteProgram(program);
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
 
-	std::cout << "Hello CMake." << std::endl;
 	return 0;
 }
