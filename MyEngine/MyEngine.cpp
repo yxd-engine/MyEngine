@@ -132,30 +132,41 @@ int main(void)
 
 	float vertices[] = {
 		-0.5f, -0.5f,
-		 0.0f,  0.5f,
-		 0.5f, -0.5f
+		 0.5f, -0.5f,
+		 0.5f,  0.5f,
+		-0.5f,  0.5f,
+
 	};
 
-	GLuint VBO, VAO;
+	unsigned int indices[] = {
+		0,1,2,
+		2,3,0
+	};
+
+	unsigned int VBO, VAO;
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6, vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 2, vertices, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
+
+	unsigned int EBO;
+	glGenBuffers(1, &EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 6, indices, GL_STATIC_DRAW);
+
 
 	glBindVertexArray(0);
 
 	ShdaerProgramSource source = ParseShdaer("res/shaders/Shader.glsl");
 
-	std::cout << source.VertexSource << std::endl;
-	std::cout << source.FragmentSource << std::endl;
+	unsigned int program = CreateShader(source.VertexSource, source.FragmentSource);
+	glUseProgram(program);
 
-	//unsigned int program = CreateShader(vertexShader, fragmentShdaer);
-	//glUseProgram(program);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -167,13 +178,14 @@ int main(void)
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		//glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
-	//glDeleteProgram(program);
+	glDeleteProgram(program);
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
