@@ -1,10 +1,48 @@
 ﻿#include <iostream>
+#include <fstream>
+#include <sstream>
 #define GLFW_INCLUDE_NONE
 #include "GLFW/glfw3.h"
 #include <glad/gl.h>
 
 int WIDTH = 800;
 int HEIGHT = 600;
+
+struct  ShdaerProgramSource
+{
+	std::string VertexSource;
+	std::string FragmentSource;
+};
+
+static ShdaerProgramSource ParseShdaer(const std::string& filepath)
+{
+	std::ifstream stream(filepath);
+
+	enum class ShdaerType
+	{
+		NONE = -1, VERTEX = 0, FRAGMENT = 1
+	};
+
+	std::stringstream ss[2];
+	std::string line;
+	ShdaerType type = ShdaerType::NONE;
+	while (getline(stream, line))
+	{
+		if (line.find("#shader") != std::string::npos)
+		{
+			if (line.find("vertex") != std::string::npos)
+				type = ShdaerType::VERTEX;
+			else if (line.find("fragment") != std::string::npos)
+				type = ShdaerType::FRAGMENT;
+		}
+		else
+		{
+			ss[(int)type] << line << '\n';
+		}
+	}
+	return { ss[0].str(),ss[1].str() };
+
+}
 
 static unsigned int CompilerShader(unsigned int type, const std::string& source)
 {
@@ -20,8 +58,9 @@ static unsigned int CompilerShader(unsigned int type, const std::string& source)
 	{
 		int length;
 		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
-		char* message = (char*)alloca(length * sizeof(char));
-		glGetShaderInfoLog(id, length, &length, message);
+		//char* message = (char*)alloca(length * sizeof(char));//warning stackoverflow
+		std::string message(length, '\0');
+		glGetShaderInfoLog(id, length, &length, message.data());
 		std::cout << "Failed to compile " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << " shader!" << std::endl;
 		std::cout << message << std::endl;
 		glDeleteShader(id);
@@ -110,28 +149,13 @@ int main(void)
 
 	glBindVertexArray(0);
 
-	std::string vertexShader =
-		"#version 460\n"
-		"\n"
-		"layout(location = 0) in vec4 position;\n"
-		"\n"
-		"void main()\n"
-		"{\n"
-		"	gl_Position = position;\n"
-		"}\n";
+	ShdaerProgramSource source = ParseShdaer("res/shaders/Shader.glsl");
 
-	std::string fragmentShdaer =
-		"#version 460\n"
-		"\n"
-		"layout(location = 0) out vec4 color;\n"
-		"\n"
-		"void main()\n"
-		"{\n"
-		"	color = vec4(1.0,0.0,0.0,1.0);\n"
-		"}\n";
+	std::cout << source.VertexSource << std::endl;
+	std::cout << source.FragmentSource << std::endl;
 
-	unsigned int program = CreateShader(vertexShader, fragmentShdaer);
-	glUseProgram(program);
+	//unsigned int program = CreateShader(vertexShader, fragmentShdaer);
+	//glUseProgram(program);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -149,7 +173,7 @@ int main(void)
 		glfwPollEvents();
 	}
 
-	glDeleteProgram(program);
+	//glDeleteProgram(program);
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
