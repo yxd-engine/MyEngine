@@ -181,8 +181,6 @@ int main(void)
 	GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 6, indices, GL_STATIC_DRAW));
 
 
-	GLCall(glBindVertexArray(0));
-
 	ShdaerProgramSource source = ParseShdaer("res/shaders/Shader.glsl");
 
 	unsigned int program = CreateShader(source.VertexSource, source.FragmentSource);
@@ -192,6 +190,8 @@ int main(void)
 	ASSERT(location != -1);
 	GLCall(glUniform4f(location, 0.8f, 0.3f, 0.8f, 1.0f));
 
+
+	GLCall(glBindVertexArray(0));
 	float r = 0.0f;
 	float increment = 0.05f;
 	while (!glfwWindowShouldClose(window))
