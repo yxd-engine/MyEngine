@@ -103,7 +103,7 @@ static unsigned int CreateShader(const std::string& vertexShader, const std::str
 
 	GLCall(glLinkProgram(program));
 	GLCall(glValidateProgram(program));
-	
+
 	GLCall(glDeleteShader(vs));
 	GLCall(glDeleteShader(fs));
 
@@ -170,7 +170,7 @@ int main(void)
 
 	GLCall(glGenBuffers(1, &VBO));
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
-	GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 2, vertices, GL_STATIC_DRAW));
+	GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 4 * 2, vertices, GL_STATIC_DRAW));
 
 	GLCall(glEnableVertexAttribArray(0));
 	GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0));
@@ -188,7 +188,12 @@ int main(void)
 	unsigned int program = CreateShader(source.VertexSource, source.FragmentSource);
 	GLCall(glUseProgram(program));
 
+	GLCall(unsigned int location = glGetUniformLocation(program, "u_Color"));
+	ASSERT(location != -1);
+	GLCall(glUniform4f(location, 0.8f, 0.3f, 0.8f, 1.0f));
 
+	float r = 0.0f;
+	float increment = 0.05f;
 	while (!glfwWindowShouldClose(window))
 	{
 		//input
@@ -200,7 +205,19 @@ int main(void)
 
 		GLCall(glBindVertexArray(VAO));
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		GLCall(glUniform4f(location, r, 0.3f, 0.8f, 1.0f));
 		GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+
+		if (r > 1.0f)
+		{
+			increment = -0.05f;
+		}
+		else if (r < 0.0f)
+		{
+			increment = 0.05f;
+		}
+		r += increment;
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
