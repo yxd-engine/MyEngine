@@ -192,6 +192,9 @@ int main(void)
 
 
 	GLCall(glBindVertexArray(0));
+	GLCall(glUseProgram(0));
+	GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
+	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 	float r = 0.0f;
 	float increment = 0.05f;
 	while (!glfwWindowShouldClose(window))
@@ -203,10 +206,12 @@ int main(void)
 		//render
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		GLCall(glBindVertexArray(VAO));
-		//glDrawArrays(GL_TRIANGLES, 0, 6);
-
+		GLCall(glUseProgram(program));
 		GLCall(glUniform4f(location, r, 0.3f, 0.8f, 1.0f));
+
+		GLCall(glBindVertexArray(VAO));
+		GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO));
+		//glDrawArrays(GL_TRIANGLES, 0, 6);
 		GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
 		if (r > 1.0f)
