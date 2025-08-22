@@ -1,4 +1,4 @@
-﻿add_executable (MyEngine "MyEngine.cpp" "MyEngine.h")
+﻿add_executable (MyEngine "MyEngine.cpp" "MyEngine.h" "Renderer.h" "Renderer.cpp" "VertexBuffer.h" "VertexBuffer.cpp" "IndexBuffer.h" "IndexBuffer.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.28)
   set_property(TARGET MyEngine PROPERTY CXX_STANDARD 20)
