@@ -1,4 +1,8 @@
-﻿add_executable (MyEngine "MyEngine.cpp" "MyEngine.h" "Renderer.h" "Renderer.cpp" "VertexBuffer.h" "VertexBuffer.cpp" "IndexBuffer.h" "IndexBuffer.cpp" "VertexBufferLayout.h" "VertexArray.h" "VertexArray.cpp")
+﻿file(GLOB_RECURSE SOURCE_FILES "*.cpp" "*.h")
+
+#add_executable (MyEngine "MyEngine.cpp" "MyEngine.h" "Renderer.h" "Renderer.cpp" "VertexBuffer.h" "VertexBuffer.cpp" "IndexBuffer.h" "IndexBuffer.cpp" "VertexBufferLayout.h" "VertexArray.h" "VertexArray.cpp")
+
+add_executable(MyEngine ${SOURCE_FILES})
 
 if (CMAKE_VERSION VERSION_GREATER 3.28)
   set_property(TARGET MyEngine PROPERTY CXX_STANDARD 20)
