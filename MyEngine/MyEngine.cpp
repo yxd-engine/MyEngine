@@ -11,6 +11,7 @@
 #include "VertexArray.h"
 #include "Shader.h"
 #include "VertexBufferLayout.h"
+#include "Texture.h"
 
 int WIDTH = 800;
 int HEIGHT = 600;
@@ -82,6 +83,10 @@ int main()
 		Shader shader("res/shaders/Shader.glsl");
 		shader.Bind();
 		shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
+
+		Texture texture("res/textures/image.png");
+		texture.Bind();
+		shader.SetUniform1f("u_Texture", 0);
 
 		va.Unbind();
 		vb.Unbind();
