@@ -10,6 +10,7 @@
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "Shader.h"
+#include "VertexBufferLayout.h"
 
 int WIDTH = 800;
 int HEIGHT = 600;
@@ -38,7 +39,7 @@ int main()
 	if (window == NULL)
 	{
 		std::cerr << "Failed to Create glfwWindow" << std::endl;
-		glfwTerminate();//Don't Remember
+		glfwTerminate();//Don't forget
 		exit(EXIT_FAILURE);
 		return -1;
 	}
@@ -87,6 +88,8 @@ int main()
 		ib.Unbind();
 		shader.Unbind();
 	
+		Renderer renderer;
+
 		float r = 0.0f;
 		float increment = 0.05f;
 		while (!glfwWindowShouldClose(window))
@@ -96,15 +99,12 @@ int main()
 			//update
 
 			//render
-			glClear(GL_COLOR_BUFFER_BIT);
+			renderer.Clear();
 
 			shader.Bind();
 			shader.SetUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
 
-			va.Bind();
-			ib.Bind();
-			//glDrawArrays(GL_TRIANGLES, 0, 6);
-			GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+			renderer.Draw(va, ib, shader);
 
 			if (r > 1.0f)
 				increment = -0.05f;
