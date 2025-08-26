@@ -14,7 +14,7 @@
 #include "Texture.h"
 
 int WIDTH = 800;
-int HEIGHT = 600;
+int HEIGHT = 700;
 
 
 void error_callback(int error, const char* description)
@@ -60,10 +60,10 @@ int main()
 	{
 		//此用于域是因为  vertexbuffer和indexbuffer 是栈中分配，当glfw销毁opengl context的时候，vbo和ibo还存在，所以当vbo和ibo对象销毁会一直有问题
 		float vertices[] = {
-			-0.5f, -0.5f,
-			 0.5f, -0.5f,
-			 0.5f,  0.5f,
-			-0.5f,  0.5f,
+			-0.5f, -0.5f, 0.0f, 0.0f, //0
+			 0.5f, -0.5f, 1.0f, 0.0f, //1
+			 0.5f,  0.5f, 1.0f, 1.0f, //2
+			-0.5f,  0.5f, 0.0f, 1.0f  //3
 		};
 
 		unsigned int indices[] = {
@@ -71,10 +71,14 @@ int main()
 			2,3,0
 		};
 
+		GLCall(glEnable(GL_BLEND));
+		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
 		VertexArray va;
-		VertexBuffer vb(vertices, sizeof(float) * 4 * 2);
+		VertexBuffer vb(vertices, 4 * 4 * sizeof(float));
 
 		VertexBufferLayout layout;
+		layout.Push<float>(2);
 		layout.Push<float>(2);
 		va.AddBuffer(vb, layout);
 
@@ -92,7 +96,7 @@ int main()
 		vb.Unbind();
 		ib.Unbind();
 		shader.Unbind();
-	
+
 		Renderer renderer;
 
 		float r = 0.0f;
