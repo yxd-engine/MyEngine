@@ -12,9 +12,11 @@
 #include "Shader.h"
 #include "VertexBufferLayout.h"
 #include "Texture.h"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 int WIDTH = 800;
-int HEIGHT = 700;
+int HEIGHT = 600;
 
 
 void error_callback(int error, const char* description)
@@ -84,9 +86,12 @@ int main()
 
 		IndexBuffer ib(indices, 6);
 
+		glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
+
 		Shader shader("res/shaders/Shader.glsl");
 		shader.Bind();
 		shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
+		shader.SetUniformMat4f("u_MVP", proj);
 
 		Texture texture("res/textures/image.png");
 		texture.Bind();
