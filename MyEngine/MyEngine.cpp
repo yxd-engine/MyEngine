@@ -15,8 +15,8 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-int WIDTH = 800;
-int HEIGHT = 600;
+int WIDTH = 960;
+int HEIGHT = 540;
 
 
 void error_callback(int error, const char* description)
@@ -62,10 +62,10 @@ int main()
 	{
 		//此用于域是因为  vertexbuffer和indexbuffer 是栈中分配，当glfw销毁opengl context的时候，vbo和ibo还存在，所以当vbo和ibo对象销毁会一直有问题
 		float vertices[] = {
-			-0.5f, -0.5f, 0.0f, 0.0f, //0
-			 0.5f, -0.5f, 1.0f, 0.0f, //1
-			 0.5f,  0.5f, 1.0f, 1.0f, //2
-			-0.5f,  0.5f, 0.0f, 1.0f  //3
+			100.0f, 100.0f, 0.0f, 0.0f, //0
+			200.0f, 100.0f, 1.0f, 0.0f, //1
+			200.0f, 200.0f, 1.0f, 1.0f, //2
+			100.0f, 200.0f, 0.0f, 1.0f  //3
 		};
 
 		unsigned int indices[] = {
@@ -86,12 +86,16 @@ int main()
 
 		IndexBuffer ib(indices, 6);
 
-		glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
+		glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
+		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-100.0f, 0.0f, 0.0f));
+		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(200.0f, 200.0f, 0.0f));
+
+		glm::mat4 mvp = proj * view * model;
 
 		Shader shader("res/shaders/Shader.glsl");
 		shader.Bind();
 		shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
-		shader.SetUniformMat4f("u_MVP", proj);
+		shader.SetUniformMat4f("u_MVP", mvp);
 
 		Texture texture("res/textures/image.png");
 		texture.Bind();
