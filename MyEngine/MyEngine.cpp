@@ -19,6 +19,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "tests/TestClearColor.h"
+#include "tests/Test.h"
 
 int WIDTH = 960;
 int HEIGHT = 540;
@@ -71,6 +72,8 @@ int main()
 		GLCall(glEnable(GL_BLEND));
 		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
+		Renderer renderer;
+
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -82,22 +85,44 @@ int main()
 		ImGui_ImplGlfw_InitForOpenGL(window, true);
 		ImGui_ImplOpenGL3_Init(glsl_version);
 
-		test::TestClearColor clearColor;
+		test::Test* currentTest = nullptr;
+		test::TestMenu* testMenu = new test::TestMenu(currentTest);
+		currentTest = testMenu;
+
+		testMenu->RegisterTest<test::TestClearColor>("clear color");
+
+		//test::TestClearColor clearColor;
 
 		while (!glfwWindowShouldClose(window))
 		{
 			//input
 
 			//update
-			clearColor.OnUpdate(0.0f);
+			//clearColor.OnUpdate(0.0f);
 			//render
-			clearColor.OnRender();
+			GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
+			renderer.Clear();
+			//clearColor.OnRender();
 			// Start the Dear ImGui frame
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplGlfw_NewFrame();
 			ImGui::NewFrame();
 
-			clearColor.OnImGuiRender();
+			if (currentTest)
+			{
+				currentTest->OnUpdate(0.0);
+				currentTest->OnRender();
+				ImGui::Begin("Test");
+				if (currentTest != testMenu && ImGui::Button("<-"))
+				{
+					delete currentTest;
+					currentTest = testMenu;
+				}
+				currentTest->OnImGuiRender();
+				ImGui::End();
+			}
+
+			//clearColor.OnImGuiRender();
 
 			// Rendering
 			ImGui::Render();
@@ -106,7 +131,9 @@ int main()
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 		}
-
+		delete currentTest;
+		if (currentTest != testMenu)
+			delete testMenu;
 	}
 
 	// Cleanup
