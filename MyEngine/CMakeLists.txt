@@ -1,5 +1,5 @@
 ﻿add_executable (MyEngine "MyEngine.cpp" "MyEngine.h" "Renderer.h" "Renderer.cpp" "VertexBuffer.h" "VertexBuffer.cpp" "IndexBuffer.h" "IndexBuffer.cpp" 
-"VertexBufferLayout.h" "VertexArray.h" "VertexArray.cpp" "Shader.h" "Shader.cpp" "vender/stb_image/stb_image.h" "vender/stb_image/stb_image.cpp" "Texture.h" "Texture.cpp")
+"VertexBufferLayout.h" "VertexArray.h" "VertexArray.cpp" "Shader.h" "Shader.cpp" "vender/stb_image/stb_image.h" "vender/stb_image/stb_image.cpp" "Texture.h" "Texture.cpp" "tests/Test.h" "tests/TestClearColor.h" "tests/TestClearColor.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.28)
   set_property(TARGET MyEngine PROPERTY CXX_STANDARD 20)
