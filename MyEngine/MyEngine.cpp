@@ -19,7 +19,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "tests/TestClearColor.h"
-#include "tests/Test.h"
+#include "tests/TestTexture2D.h"
 
 int WIDTH = 960;
 int HEIGHT = 540;
@@ -90,6 +90,7 @@ int main()
 		currentTest = testMenu;
 
 		testMenu->RegisterTest<test::TestClearColor>("clear color");
+		testMenu->RegisterTest<test::TestTexture2D>("Texture 2D");
 
 		//test::TestClearColor clearColor;
 
